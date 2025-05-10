@@ -4,7 +4,7 @@ import ping from 'ping';
 
 export const getDevices = async (req, res) => {
   const { ip, status, page = 1, limit = 10 } = req.query;
-  const query = { user: req.user.userId };
+  const query = { user: req.user.userId }; // 🔐 filter by logged-in user
 
   if (ip) query.ip_address = { $regex: ip, $options: 'i' };
   if (status) query.ping_status = status;
@@ -36,7 +36,7 @@ export const addDevice = async (req, res) => {
 export const updateDevice = async (req, res) => {
   try {
     const device = await Device.findOneAndUpdate(
-      { _id: req.params.id, user: req.user.userId },
+      { _id: req.params.id, user: req.user.userId }, // 🔐 secure update
       req.body,
       { new: true }
     );
@@ -89,7 +89,7 @@ export const fetchDeviceData = async (req, res) => {
     };
 
     const device = await Device.findOneAndUpdate(
-      { ip_address, user: req.user.userId }, 
+      { ip_address, user: req.user.userId }, // 🔐 user filter
       update,
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );
