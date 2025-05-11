@@ -3,24 +3,28 @@ import axios from 'axios';
 import ping from 'ping';
 
 export const getDevices = async (req, res) => {
-  const { ip, status, page = 1, limit = 10 } = req.query;
-  const query = { user: req.user.userId }; // 🔐 filter by logged-in user
+  try {
+    const { ip, status, page = 1, limit = 3 } = req.query;
+    const query = { user: req.user.userId };
 
-  if (ip) query.ip_address = { $regex: ip, $options: 'i' };
-  if (status) query.ping_status = status;
+    if (ip) query.ip_address = { $regex: ip, $options: 'i' };
+    if (status) query.ping_status = status;
 
-  const devices = await Device.find(query)
-    .skip((page - 1) * limit)
-    .limit(parseInt(limit));
+    const devices = await Device.find(query)
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
 
-  const total = await Device.countDocuments(query);
+    const total = await Device.countDocuments(query);
 
-  res.json({
-    devices,
-    total,
-    page: parseInt(page),
-    pages: Math.ceil(total / limit),
-  });
+    res.json({
+      devices,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / limit),
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 export const addDevice = async (req, res) => {
@@ -36,7 +40,7 @@ export const addDevice = async (req, res) => {
 export const updateDevice = async (req, res) => {
   try {
     const device = await Device.findOneAndUpdate(
-      { _id: req.params.id, user: req.user.userId }, // 🔐 secure update
+      { _id: req.params.id, user: req.user.userId }, 
       req.body,
       { new: true }
     );
@@ -89,7 +93,7 @@ export const fetchDeviceData = async (req, res) => {
     };
 
     const device = await Device.findOneAndUpdate(
-      { ip_address, user: req.user.userId }, // 🔐 user filter
+      { ip_address, user: req.user.userId }, 
       update,
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );
