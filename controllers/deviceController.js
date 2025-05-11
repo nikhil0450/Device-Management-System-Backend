@@ -1,7 +1,8 @@
 import Device from '../models/Device.js';
 import axios from 'axios';
-// import ping from 'ping';
+import ping from 'ping';
 import net from 'net';
+import os from 'os';
 
 export const getDevices = async (req, res) => {
   try {
@@ -71,27 +72,30 @@ export const deleteDevice = async (req, res) => {
 // };
 
 export const pingDevice = async (req, res) => {
-  const deviceId = req.params.id;
-
-  const device = await Device.findById(deviceId);
+  const device = await Device.findById(req.params.id);
   if (!device) return res.status(404).json({ error: 'Device not found' });
 
   const ip = device.ip_address;
-  const port = 80; 
 
-  const socket = new net.Socket();
-  const timeout = 3000;
+  const isRender = process.env.RENDER === 'true'; // Or any custom ENV you define
 
-  socket.setTimeout(timeout);
+  if (isRender) {
+    const port = 80;
+    const socket = new net.Socket();
+    socket.setTimeout(3000);
 
-  socket.on('connect', () => {
-    socket.destroy();
-    res.json({ ping_output: `Success: ${ip} is reachable` });
-  }).on('error', () => {
-    res.json({ ping_output: `Fail: ${ip} is unreachable` });
-  }).on('timeout', () => {
-    res.json({ ping_output: `Timeout: ${ip} did not respond` });
-  }).connect(port, ip);
+    socket.on('connect', () => {
+      socket.destroy();
+      res.json({ ping_output: `Success: ${ip} is reachable` });
+    }).on('error', () => {
+      res.json({ ping_output: `Fail: ${ip} is unreachable` });
+    }).on('timeout', () => {
+      res.json({ ping_output: `Timeout: ${ip} did not respond` });
+    }).connect(port, ip);
+  } else {
+    const result = await ping.promise.probe(ip, { timeout: 3 });
+    res.json({ ping_output: result.alive ? `Success: ${ip} is reachable` : `Fail: ${ip} is unreachable` });
+  }
 };
 
 export const dashboardStats = async (req, res) => {
