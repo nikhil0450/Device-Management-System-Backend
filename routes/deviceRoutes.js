@@ -4,10 +4,10 @@ import {
   addDevice,
   updateDevice,
   deleteDevice,
+  pingDevice,
   dashboardStats,
   fetchDeviceData,
 } from '../controllers/deviceController.js';
-import { pingDevice } from '../controllers/pingController.js';
 import auth from '../middleware/authMiddleware.js';
 
 const router = express.Router();
