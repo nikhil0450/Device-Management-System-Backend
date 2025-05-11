@@ -4,7 +4,7 @@ import {
   addDevice,
   updateDevice,
   deleteDevice,
-  pingDevice,
+  // pingDevice,
   dashboardStats,
   fetchDeviceData,
 } from '../controllers/deviceController.js';
