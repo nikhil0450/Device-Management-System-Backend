@@ -1,6 +1,6 @@
 import Device from '../models/Device.js';
 import axios from 'axios';
-import ping from 'ping';
+// import ping from 'ping';
 
 export const getDevices = async (req, res) => {
   try {
@@ -57,17 +57,17 @@ export const deleteDevice = async (req, res) => {
   res.json({ message: 'Deleted' });
 };
 
-export const pingDevice = async (req, res) => {
-  const device = await Device.findOne({ _id: req.params.id, user: req.user.userId });
-  if (!device) return res.status(404).json({ error: 'Not found' });
+// export const pingDevice = async (req, res) => {
+//   const device = await Device.findOne({ _id: req.params.id, user: req.user.userId });
+//   if (!device) return res.status(404).json({ error: 'Not found' });
 
-  const result = await ping.promise.probe(device.ip_address);
-  device.ping_status = result.alive ? 'Success' : 'Failed';
-  device.ping_output = result.output || JSON.stringify(result);
-  await device.save();
+//   const result = await ping.promise.probe(device.ip_address);
+//   device.ping_status = result.alive ? 'Success' : 'Failed';
+//   device.ping_output = result.output || JSON.stringify(result);
+//   await device.save();
 
-  res.json(device);
-};
+//   res.json(device);
+// };
 
 export const dashboardStats = async (req, res) => {
   const userFilter = { user: req.user.userId };
