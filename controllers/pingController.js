@@ -1,15 +1,13 @@
-// controllers/pingController.js
 import net from 'net';
 
 export const pingDevice = async (req, res) => {
   const deviceId = req.params.id;
 
-  // get IP from DB (however you're doing it)
   const device = await Device.findById(deviceId);
   if (!device) return res.status(404).json({ error: 'Device not found' });
 
   const ip = device.ip_address;
-  const port = 80; // or another open port
+  const port = 80; 
 
   const socket = new net.Socket();
   const timeout = 3000;
